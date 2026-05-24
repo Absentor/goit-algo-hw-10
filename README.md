@@ -22,10 +22,18 @@ The definite integral of the function f(x) = x² on the interval [0, 2] was calc
 - Monte Carlo method
 - scipy.integrate.quad
 
+### Results
+
+Monte Carlo result was very close to the analytical result calculated using the `quad` function.
+
+Example:
+- Monte Carlo result ≈ 2.67
+- quad result = 2.666666666666667
+
 ### Conclusions
 
-The Monte Carlo method produced an approximate result close to the analytical solution.
+Monte Carlo integration provides approximate results that become more accurate as the number of random samples increases.
 
-The quad function returned a more precise value.
+The `quad` function from SciPy produces a more precise analytical result.
 
-Monte Carlo integration is useful for complex problems where analytical integration is difficult or impossible.
+The comparison confirms that the Monte Carlo method is effective for numerical approximation of integrals.
