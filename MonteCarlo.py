@@ -1,83 +1,91 @@
-import timeit
-
-
-coins = [50, 25, 10, 5, 2, 1]
-
-
-# =========================
-# Greedy Algorithm
-# =========================
-
-def find_coins_greedy(amount):
-    result = {}
-
-    for coin in coins:
-
-        count = amount // coin
-
-        if count > 0:
-            result[coin] = count
-            amount -= coin * count
-
-    return result
+import random
+import numpy as np
+import matplotlib.pyplot as plt
+import scipy.integrate as spi
 
 
 # =========================
-# Dynamic Programming
+# Function
 # =========================
 
-def find_min_coins(amount):
+def f(x):
+    return x ** 2
 
-    min_coins = [float("inf")] * (amount + 1)
-    min_coins[0] = 0
 
-    coin_used = [0] * (amount + 1)
-
-    for coin in coins:
-
-        for i in range(coin, amount + 1):
-
-            if min_coins[i - coin] + 1 < min_coins[i]:
-                min_coins[i] = min_coins[i - coin] + 1
-                coin_used[i] = coin
-
-    result = {}
-
-    while amount > 0:
-        coin = coin_used[amount]
-
-        result[coin] = result.get(coin, 0) + 1
-
-        amount -= coin
-
-    return result
+# Integration limits
+a = 0
+b = 2
 
 
 # =========================
-# Testing
+# Monte Carlo Method
 # =========================
 
-amount = 113
+def monte_carlo_integral(func, a, b, samples=100000):
 
-print("Greedy:", find_coins_greedy(amount))
-print("Dynamic:", find_min_coins(amount))
+    max_y = max(func(a), func(b))
+
+    inside_points = 0
+
+    for _ in range(samples):
+
+        x = random.uniform(a, b)
+        y = random.uniform(0, max_y)
+
+        if y <= func(x):
+            inside_points += 1
+
+    rectangle_area = (b - a) * max_y
+
+    return rectangle_area * (inside_points / samples)
+
+
+# Monte Carlo result
+mc_result = monte_carlo_integral(f, a, b)
 
 
 # =========================
-# Time comparison
+# quad result
 # =========================
 
-large_amount = 10000
+quad_result, error = spi.quad(f, a, b)
 
-greedy_time = timeit.timeit(
-    lambda: find_coins_greedy(large_amount),
-    number=1000
-)
 
-dynamic_time = timeit.timeit(
-    lambda: find_min_coins(large_amount),
-    number=1000
-)
+# =========================
+# Output
+# =========================
 
-print(f"\nGreedy time: {greedy_time:.6f} seconds")
-print(f"Dynamic programming time: {dynamic_time:.6f} seconds")
+print(f"Monte Carlo result: {mc_result}")
+print(f"quad result: {quad_result}")
+print(f"Error estimate: {error}")
+
+
+# =========================
+# Plot
+# =========================
+
+x = np.linspace(-0.5, 2.5, 400)
+y = f(x)
+
+fig, ax = plt.subplots()
+
+ax.plot(x, y, 'r', linewidth=2)
+
+ix = np.linspace(a, b)
+iy = f(ix)
+
+ax.fill_between(ix, iy, color='gray', alpha=0.3)
+
+ax.set_xlim([x[0], x[-1]])
+ax.set_ylim([0, max(y) + 0.1])
+
+ax.set_xlabel('x')
+ax.set_ylabel('f(x)')
+
+ax.axvline(x=a, color='gray', linestyle='--')
+ax.axvline(x=b, color='gray', linestyle='--')
+
+ax.set_title('Monte Carlo Integration')
+
+plt.grid()
+plt.show()
